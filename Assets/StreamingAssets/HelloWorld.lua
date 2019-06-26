@@ -1,6 +1,6 @@
 return function()
-    print("Hello world WOOT WOOT!")
-    SetText("I'm a lua script!")
+    print("Hello "..State.PlayerName.."! WOOT WOOT!")
+    SetText("Hello "..State.PlayerName.."! It's working!")
     coroutine.yield()
     SetText("second slide")
 end

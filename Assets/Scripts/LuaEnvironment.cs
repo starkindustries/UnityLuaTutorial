@@ -10,15 +10,30 @@ public class LuaEnvironment : MonoBehaviour
     private string fileName;
     private Script environment;
     private MoonSharp.Interpreter.Coroutine activeCoroutine;
+    private GameState luaGameState;
 
-    void Start()
+
+    public GameState LuaGameState
+    {
+        get { return luaGameState; }
+    }
+
+    private void Awake()
+    {
+        luaGameState = new GameState();
+    }
+
+    private IEnumerator Start()
     {
         Script.DefaultOptions.DebugPrint = (s) => Debug.Log(s);
+        UserData.RegisterAssembly();
 
         environment = new Script();
         environment.Globals["SetText"] = (Action<string>)LuaCommands.SetText;
+        environment.Globals["State"] = UserData.Create(luaGameState);
 
-        // environment.DoString("print 'Hello world!'");
+        // wait 1 frame then return the file
+        yield return 1;
 
         LoadFile(fileName);
         AdvanceScript();
