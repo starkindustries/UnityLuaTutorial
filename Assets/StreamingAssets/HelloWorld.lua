@@ -13,7 +13,15 @@ return function()
 
     if State.ButtonSelected == 1 then
         SetText("You chose the lambo. Typical..")
+        State.SetFlag("FirstButton", true)
     else     
         SetText("You chose the TESLA! EXCELLENT CHOICE!")
+        State.SetFlag("SecondButton", true)
+    end
+
+    if State.GetFlag("FirstButton") then
+        SetText("FirstButton flag was set!")
+    elseif State.GetFlag("SecondButton") then
+        SetText("SecondButton flag was set!")
     end
 end

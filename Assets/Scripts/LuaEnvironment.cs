@@ -28,7 +28,8 @@ public class LuaEnvironment : MonoBehaviour
         Script.DefaultOptions.DebugPrint = (s) => Debug.Log(s);
         UserData.RegisterAssembly();
 
-        environment = new Script();
+        // Use SoftSandbox preset to keep your users safe!
+        environment = new Script(CoreModules.Preset_SoftSandbox);
         environment.Globals["SetText"] = (Action<string>)LuaCommands.SetText;
         environment.Globals["ShowButtons"] = (Action<string, string>)LuaCommands.ShowButtons;
         environment.Globals["State"] = UserData.Create(luaGameState);        
