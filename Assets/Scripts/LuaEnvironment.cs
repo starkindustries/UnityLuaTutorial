@@ -3,13 +3,14 @@ using MoonSharp.Interpreter;
 using System.IO;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LuaEnvironment : MonoBehaviour
 {
     [SerializeField]
     private string fileName;
     private Script environment;
-    private MoonSharp.Interpreter.Coroutine activeCoroutine;
+    private Stack<MoonSharp.Interpreter.Coroutine> coroutineStack;
     private GameState luaGameState;
 
 
@@ -27,6 +28,9 @@ public class LuaEnvironment : MonoBehaviour
     {
         Script.DefaultOptions.DebugPrint = (s) => Debug.Log(s);
         UserData.RegisterAssembly();
+
+        // Initialize the coroutine stack
+        coroutineStack = new Stack<MoonSharp.Interpreter.Coroutine>();
 
         // Use SoftSandbox preset to keep your users safe!
         environment = new Script(CoreModules.Preset_SoftSandbox);
@@ -61,35 +65,44 @@ public class LuaEnvironment : MonoBehaviour
 
         if(returnValue.Type == DataType.Function)
         {
-            activeCoroutine = environment.CreateCoroutine(returnValue).Coroutine;            
-        }
-        else
-        {
-            activeCoroutine = null;
+            coroutineStack.Push(environment.CreateCoroutine(returnValue).Coroutine);
         }
     }
 
     public void AdvanceScript()
     {
-        if(activeCoroutine != null)
-        {            
-            if (activeCoroutine.State == CoroutineState.Dead)
-            {
-                activeCoroutine = null;
-                Debug.Log("Dialogue complete");
-                return;
-            }
-
+        // Check if the Coroutine stack is empty
+        if(coroutineStack.Count > 0)
+        {
             try
-            {
-                activeCoroutine.Resume();                
+            {                
+                MoonSharp.Interpreter.Coroutine activeCoroutine = coroutineStack.Peek();
+                
+                // Save the active coroutine's return value
+                DynValue returnValue = activeCoroutine.Resume();
+
+                // If the active coroutine is dead, pop it off the stack
+                if (activeCoroutine.State == CoroutineState.Dead)
+                {
+                    coroutineStack.Pop();
+                    Debug.Log("Dialogue complete");
+                }
+
+                // If the return value is a function, add it to the top of the coroutine stack
+                if (returnValue.Type == DataType.Function)
+                {
+                    coroutineStack.Push(environment.CreateCoroutine(returnValue).Coroutine);
+                }                                
             } 
             catch (ScriptRuntimeException e)
             {
                 Debug.LogError(e.DecoratedMessage);
+                coroutineStack.Clear();
             }
-            return;
         }
-        Debug.Log("No active dialogue");
+        else
+        {
+            Debug.Log("No active dialogue");
+        }        
     }
 }
