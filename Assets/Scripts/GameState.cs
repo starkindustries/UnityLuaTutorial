@@ -20,4 +20,20 @@ public class GameState
             playerName = value;
         }
     }
+
+    private int buttonSelected;
+
+    public int ButtonSelected
+    {
+        get
+        {
+            return buttonSelected;
+        }
+        [MoonSharpHidden]
+        set
+        {
+            buttonSelected = value;
+        }
+    }
+
 }

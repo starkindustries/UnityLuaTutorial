@@ -30,7 +30,8 @@ public class LuaEnvironment : MonoBehaviour
 
         environment = new Script();
         environment.Globals["SetText"] = (Action<string>)LuaCommands.SetText;
-        environment.Globals["State"] = UserData.Create(luaGameState);
+        environment.Globals["ShowButtons"] = (Action<string, string>)LuaCommands.ShowButtons;
+        environment.Globals["State"] = UserData.Create(luaGameState);        
 
         // wait 1 frame then return the file
         yield return 1;
@@ -77,7 +78,15 @@ public class LuaEnvironment : MonoBehaviour
                 Debug.Log("Dialogue complete");
                 return;
             }
-            activeCoroutine.Resume();
+
+            try
+            {
+                activeCoroutine.Resume();                
+            } 
+            catch (ScriptRuntimeException e)
+            {
+                Debug.LogError(e.DecoratedMessage);
+            }
             return;
         }
         Debug.Log("No active dialogue");
