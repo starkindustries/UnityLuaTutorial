@@ -2,7 +2,7 @@
 
 Based on Ned Makes Games's Tutorial:
 
-** Using Lua scripting for branching dialogue trees! **  
+**Using Lua scripting for branching dialogue trees!**  
 [https://www.youtube.com/watch?v=ngGJDI44z48](https://www.youtube.com/watch?v=ngGJDI44z48)
 
 ## Timestamps for the tutorial
